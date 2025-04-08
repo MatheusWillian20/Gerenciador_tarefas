@@ -31,7 +31,8 @@ if ($sql->rowCount() > 0) {
 
         <div id="tasks">
             <?php foreach($tasks as $task): ?>
-                <div class="task">
+                <?php $prioridade = strtolower($task['prioridade']); ?>
+                    <div class="task <?= $prioridade ?>">
                     <input 
                         type="checkbox" 
                         name="progress" 
@@ -65,6 +66,11 @@ if ($sql->rowCount() > 0) {
                         <button type="submit" class="form-button confirm-button">
                             <i class="fa-solid fa-check"></i>
                         </button>
+                        <select name="prioridade" required>
+                            <option value="Alta">Alta</option>
+                            <option value="Média" selected>Média</option>
+                            <option value="Baixa">Baixa</option>
+                        </select>
                     </form>
                 </div>
             <?php endforeach ?>

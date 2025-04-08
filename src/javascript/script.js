@@ -31,7 +31,7 @@ $(document).ready(function () {
                 }
             },
             error: function () {
-                alert('Ocorreu um erro');
+                alert('....');
             }
         });
     })

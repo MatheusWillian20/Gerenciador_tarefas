@@ -1,17 +1,18 @@
-<?php 
-
+<?php
 require_once('../database/conn.php');
 
-$description = filter_input(INPUT_POST,  'description');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $description = $_POST['description'] ?? '';
+    $prioridade = $_POST['prioridade'] ?? 'Média';
 
-if ($description) {
-    $sql = $pdo->prepare("INSERT INTO task (description) VALUES (:description)");
-    $sql->bindValue(':description', $description);
-    $sql->execute();
-
-    header('Location: ../index.php');
-    exit;
-} else {
-    header('Location: ../index.php');
-    exit;
+    if (!empty($description)) {
+        $stmt = $pdo->prepare("INSERT INTO task (description, prioridade) VALUES (:description, :prioridade)");
+        $stmt->execute([
+            ':description' => $description,
+            ':prioridade' => $prioridade
+        ]);
+    }
 }
+
+header("Location: ../index.php");
+exit;

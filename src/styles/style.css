@@ -128,3 +128,13 @@ body {
         width: 300px;
     }
 }
+
+.task.alta {
+    border-left: 6px solid #dc2626; /* vermelho */
+}
+.task.média {
+    border-left: 6px solid #f97316; /* laranja */
+}
+.task.baixa {
+    border-left: 6px solid #22c55e; /* verde */
+}
