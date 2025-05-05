@@ -17,9 +17,9 @@ $(document).ready(function () {
 
     $('.progress').on('change', function () {
         const id = $(this).data('task-id');
-        const completed = $(this).is(':checked') ? 'true' : 'false';
+        const completed = $(this).is(':checked') ? 1 : 0;
         $.ajax({
-            url: '../../actions/update-progress.php',
+            url: 'actions/update-progress.php',
             method: 'POST',
             data: {id: id, completed: completed},
             dataType: 'json',
@@ -31,8 +31,57 @@ $(document).ready(function () {
                 }
             },
             error: function () {
-                alert('....');
+                alert('Erro');
             }
         });
     })
+});
+
+function updateCompletedCounter() {
+    const total = $('.progress').length;
+    const completed = $('.progress:checked').length;
+
+    $('#completed-counter').text(`Tarefas concluídas: ${completed} de ${total}`);
+}
+
+$(document).ready(function () {
+    // Já existente:
+    $('.edit-button').on('click', function () {
+        var task = $(this).closest('.task');
+        task.find('.progress').addClass('hidden');
+        task.find('.task-description').addClass('hidden');
+        task.find('.task-actions').addClass('hidden');
+        task.find('.edit-task').removeClass('hidden');
+    });
+
+    $('.progress').on('click', function () {
+        if ($(this).is(':checked')) {
+            $(this).addClass('done');
+        } else {
+            $(this).removeClass('done');
+        }
+        updateCompletedCounter(); // <<< Atualiza o contador visualmente
+    });
+
+    $('.progress').on('change', function () {
+        const id = $(this).data('task-id');
+        const completed = $(this).is(':checked') ? 'true' : 'false';
+
+        $.ajax({
+            url: 'actions/update-progress.php',
+            method: 'POST',
+            data: {id: id, completed: completed},
+            dataType: 'json',
+            success: function (response) {
+                if (!response.success) {
+                    alert('Erro ao editar a tarefa');
+                }
+            },
+            error: function () {
+                alert('Erro de comunicação com o servidor.');
+            }
+        });
+    });
+
+    updateCompletedCounter(); // Chamada inicial
 });

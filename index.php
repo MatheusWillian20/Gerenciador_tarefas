@@ -8,6 +8,16 @@ $sql = $pdo->query("SELECT * FROM task ORDER BY id ASC");
 if ($sql->rowCount() > 0) {
     $tasks = $sql->fetchAll(PDO::FETCH_ASSOC);
 }
+
+// Contagem de tarefas concluídas
+$completedCount = 0;
+$totalCount = count($tasks);
+
+foreach ($tasks as $task) {
+    if ($task['completed'] == 'true' || $task['completed'] == 1) {
+        $completedCount++;
+    }
+}
 ?><!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -21,7 +31,9 @@ if ($sql->rowCount() > 0) {
 <body>
     <div id="to_do">
         <h1>Minhas tarefas</h1>
-
+        <p id="completed-counter" style="color: #e5f9ff; text-align: center;">
+        Tarefas concluídas: <?= $completedCount ?> de <?= $totalCount ?>
+        </p>
         <form action="actions/create.php" method="POST" class="to-do-form">
             <input type="text" name="description" placeholder="Escreva sua tarefa" required>
             <button type="submit" class="form-button">
