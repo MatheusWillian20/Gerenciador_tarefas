@@ -1,22 +1,20 @@
 <?php
+session_start();
 require_once('../database/conn.php');
 
-// Pega os dados enviados via POST
-$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-$completed = isset($_POST['completed']) ? (int)$_POST['completed'] : null;
+$id = $_POST['id'] ?? null;
+$completed = $_POST['completed'] === 'true' ? true : false;
+$userId = $_SESSION['user_id'] ?? null;
 
-if ($id !== false && $completed !== null) {
-    try {
-        $sql = $pdo->prepare("UPDATE task SET completed = :completed WHERE id = :id");
-        $sql->bindValue(':completed', $completed, PDO::PARAM_INT);
-        $sql->bindValue(':id', $id, PDO::PARAM_INT);
-        $sql->execute();
+if ($id && $userId) {
+    $check = $pdo->prepare("SELECT id FROM task WHERE id = :id AND user_id = :user_id");
+    $check->execute([':id' => $id, ':user_id' => $userId]);
 
-        echo json_encode(['success' => true]);
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    if ($check->rowCount() > 0) {
+        $stmt = $pdo->prepare("UPDATE task SET completed = :completed WHERE id = :id");
+        $stmt->execute([
+            ':completed' => $completed,
+            ':id' => $id
+        ]);
     }
-} else {
-    echo json_encode(['success' => false, 'error' => 'ID ou status inválido']);
 }
-exit;

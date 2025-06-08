@@ -1,12 +1,20 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
 require_once('database/conn.php');
 
 $tasks = [];
 
-$sql = $pdo->query("SELECT * FROM task ORDER BY id ASC");
+$userId = $_SESSION['user_id'];
+$stmt = $pdo->prepare("SELECT * FROM task WHERE user_id = :user_id ORDER BY id ASC");
+$stmt->execute([':user_id' => $userId]);
 
-if ($sql->rowCount() > 0) {
-    $tasks = $sql->fetchAll(PDO::FETCH_ASSOC);
+if ($stmt->rowCount() > 0) {
+    $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Contagem de tarefas concluídas
@@ -30,9 +38,13 @@ foreach ($tasks as $task) {
 </head>
 <body>
     <div id="to_do">
+        <p style="color: #e5f9ff; text-align: center;">
+         Usuário: <?= $_SESSION['user'] ?> |
+         <a href="logout.php" style="color: #77ccff;">Sair</a>
+        </p>
         <h1>Minhas tarefas</h1>
         <p id="completed-counter" style="color: #e5f9ff; text-align: center;">
-        Tarefas concluídas: <?= $completedCount ?> de <?= $totalCount ?>
+         Tarefas concluídas: <?= $completedCount ?> de <?= $totalCount ?>
         </p>
         <form action="actions/create.php" method="POST" class="to-do-form">
             <input type="text" name="description" placeholder="Escreva sua tarefa" required>
@@ -80,8 +92,8 @@ foreach ($tasks as $task) {
                         </button>
                         <select name="prioridade" required>
                             <option value="Alta">Alta</option>
-                            <option value="Média" selected>Média</option>
-                            <option value="Baixa">Baixa</option>
+                            <option value="Média" <?= $task['prioridade'] === 'Média' ? 'selected' : '' ?>>Média</option>
+                            <option value="Baixa" <?= $task['prioridade'] === 'Baixa' ? 'selected' : '' ?>>Baixa</option>
                         </select>
                     </form>
                 </div>
